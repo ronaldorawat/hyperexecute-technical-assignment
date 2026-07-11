@@ -1,0 +1,37 @@
+version: "0.1"
+
+runson: win
+
+autosplit: true
+concurrency: 1
+
+env:
+  ENVIRONMENT: staging
+
+pre:
+  - echo Environment = $ENVIRONMENT
+  - mvn dependency:resolve
+
+testDiscovery:
+  type: raw
+  mode: dynamic
+  command: >
+    grep "test name" xml/testng_win.xml |
+    awk '{print $2}' |
+    sed 's/name=//g' |
+    sed 's/>//g'
+
+testRunnerCommand: >
+  mvn test
+  -Dplatname=win
+  -Dmaven.repo.local=./.m2
+  -DselectedTests=$test
+
+retryOnFailure: true
+maxRetries: 1
+
+jobLabel:
+  - selenium-testng
+  - win
+  - v1
+  - autosplit
